@@ -10,10 +10,12 @@ import {
   Keyboard,
   TouchableOpacity,
   ScrollView,
+  
 } from "react-native";
-import { AsyncStorage } from "@react-native-async-storage/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { auth } from '../firebaseConfig';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { AUTH_DOMAIN } from '@env';
 
 const RegisterScreen = ({ navigation }) => {
     const [firstName, setFirstName] = useState('');
@@ -33,20 +35,46 @@ const RegisterScreen = ({ navigation }) => {
 
     const handleSubmitPress = () => {
         setError("");
-        if (!firstName) return alert('Please fill in First Name field!');
-        if (!lastName) return alert('Please fill in Last Name field!');
-        if (!age) return alert('Please fill in Age field!');
-        if (!address) return alert('Please fill in Address field!');
-        if (!email) return alert('Please fill in Email field!');
-        if (!password) return alert('Please fill in Password field!');
-
+        if (!firstName) {
+            alert('Please fill in First Name field!');
+            return;
+        }
+        AsyncStorage.setItem('firstName', JSON.stringify(firstName));
+        if (!lastName) {
+            alert('Please fill in Last Name field!');
+            return;
+        }
+        AsyncStorage.setItem('lastName', JSON.stringify(lastName));
+        if (!age) {
+            alert('Please fill in Age field!');
+            return;
+        }
+        AsyncStorage.setItem('age', JSON.stringify(age));
+        if (!address) {
+            alert('Please fill in Address field!');
+            return;
+        }
+        AsyncStorage.setItem('address', JSON.stringify(address));
+        if (!email) {
+            alert('Please fill in Email field!');
+            return;
+        }
+        AsyncStorage.setItem('email', JSON.stringify(email));
+        if (!password) {
+            alert('Please fill in Password field!');
+            return;
+        }
+        AsyncStorage.setItem('password', JSON.stringify(password));
+        console.log(AUTH_DOMAIN);
         createUserWithEmailAndPassword(auth, email, password) 
         .then((user) => {
-            if (user) {
-                // user.user.updateProfile({displayName: firstName});
-                // AsyncStorage.setItem('user', JSON.stringify(user.user.displayName));
-                navigation.replace('HomeScreen');
-            }
+            sendEmailVerification(user.user, {
+                handleCodeInApp: true,
+                url: `https://${AUTH_DOMAIN}`,
+            })
+            .then(() => {
+                alert('Email Verification Sent!');
+                navigation.navigate('LoginScreen');
          })
         .catch((error) => {
             console.log(error);
@@ -60,14 +88,14 @@ const RegisterScreen = ({ navigation }) => {
                 setError('Something went wrong, please try again later!');
             }
         });
-    };
+    })};
 
     return (
     <SafeAreaView style={styles.mainBody}>
         <ScrollView
-            keyboardShouldPersistTaps="handled"
+            keyboardShouldPersistTaps='handled'
             contentContainerStyle={{
-                flex: 1,
+                flexGrow: 1,
                 justifyContent: 'center',
                 alignContent: 'center',
             }}>
@@ -236,6 +264,9 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 30,
         borderColor: 'white',
+        flexDirection: 'row',
+        height: 40,
+        margin: 5,
     },
     errorTextStyle: {
         color: 'red',

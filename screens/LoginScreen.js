@@ -33,7 +33,11 @@ const LoginScreen = ({ navigation }) => {
         }
         signInWithEmailAndPassword(auth, email, password)
             .then((user) => {
-                if (user) navigation.replace('HomeScreen');
+                if (user.user.emailVerified) {
+                    navigation.replace('HomeScreen');
+                } else {
+                    alert('Please verify your email before logging in! The email may be in your spam folder.');
+                }
             })
             .catch(error => {
                 console.log(error);
