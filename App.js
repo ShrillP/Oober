@@ -1,20 +1,43 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import 'react-native-gesture-handler';
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import LoginScreen from './screens/LoginScreen';
+import HomeScreen from './screens/HomeScreen';
+import RegisterScreen from './screens/RegisterScreen';
 
-export default function App() {
+const Stack = createNativeStackNavigator();
+
+const Auth = () => {
   return (
-    <View style={styles.container}>
-      <Text>Oober</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Stack.Navigator initialRouteName='LoginScreen'>
+      <Stack.Screen name='LoginScreen' component={LoginScreen} options={{ headerShown: false }}/>
+      <Stack.Screen name='RegisterScreen'
+        component={RegisterScreen} 
+        options={{
+          title: 'Register',
+          headerStyle: {
+            backgroundColor: '#5FBAA7',
+          },
+          headerTintColor: '#2b2b2b',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}
+      />
+    </Stack.Navigator>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const App = () => {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName='Auth'>
+        <Stack.Screen name='Auth' component={Auth} options={{ headerShown: false }}/>
+        <Stack.Screen name='HomeScreen' component={HomeScreen} options={{ headerShown: false }}/>
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
+
+export default App;
