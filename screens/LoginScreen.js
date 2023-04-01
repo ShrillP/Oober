@@ -49,7 +49,7 @@ const LoginScreen = ({ navigation }) => {
                     setError('Something went wrong, please try again later!');
                 }
             }
-        );  
+        );
     };
 
   return (

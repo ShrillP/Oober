@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { auth } from '../firebaseConfig';
-import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
 import { AUTH_DOMAIN } from '@env';
 
 const RegisterScreen = ({ navigation }) => {
@@ -65,7 +65,6 @@ const RegisterScreen = ({ navigation }) => {
             return;
         }
         AsyncStorage.setItem('password', JSON.stringify(password));
-        console.log(AUTH_DOMAIN);
         createUserWithEmailAndPassword(auth, email, password) 
         .then((user) => {
             sendEmailVerification(user.user, {
@@ -73,7 +72,7 @@ const RegisterScreen = ({ navigation }) => {
                 url: `https://${AUTH_DOMAIN}`,
             })
             .then(() => {
-                alert('Email Verification Sent!');
+                alert('Registration successful! Email Verification Sent!');
                 navigation.navigate('LoginScreen');
          })
         .catch((error) => {
@@ -87,6 +86,9 @@ const RegisterScreen = ({ navigation }) => {
             } else {
                 setError('Something went wrong, please try again later!');
             }
+        });
+        updateProfile(auth.currentUser, {
+            displayName: firstName,
         });
     })};
 
