@@ -1,4 +1,5 @@
 import { StyleSheet, View, Text } from 'react-native'
+import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import React from 'react'
 import { auth } from '../firebaseConfig';
 
@@ -16,7 +17,10 @@ const HomeScreen = () => {
     <View style={styles.mainBody}>
       <View style={styles.header}>
         <Text style={styles.headerText}>Welcome, {getDisplayName()}!</Text>
-        </View>
+      </View>
+      <View style={styles.container}>
+        <MapView provider={PROVIDER_GOOGLE} style={styles.map}/>
+      </View>
     </View>
   );
 };
@@ -42,5 +46,12 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     alignItems: 'baseline',
     paddingTop: '20%'
+  },
+  container: {
+    flex: 1,
+  },
+  map: {
+    width: '100%',
+    height: '100%',
   },
 });
