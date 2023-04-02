@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useState, createRef } from "react";
-import { doc, updateDoc } from "firebase/firestore";
+import React, { useState, createRef, } from "react";
+import { doc, updateDoc, deleteDoc, } from "firebase/firestore";
 import {
   SafeAreaView,
   StyleSheet,
@@ -12,10 +12,11 @@ import {
   Keyboard,
   TouchableOpacity,
   ScrollView,
+  Alert,
   
 } from "react-native";
 import { auth, db} from '../../../firebaseConfig';
-import {updateProfile, updatePassword, signOut} from 'firebase/auth';
+import {updateProfile, updatePassword, signOut, deleteUser } from 'firebase/auth';
 
   const UpdateScreen = ({ navigation }) => {
     const [firstName, setFirstName] = useState('');
@@ -35,7 +36,6 @@ import {updateProfile, updatePassword, signOut} from 'firebase/auth';
 
     const handleSubmitPress = () => {
         setError("");
-        console.log(auth.currentUser.uid)
         const docRef = doc(db, 'Users', auth.currentUser.uid)
         if (firstName) {
           updateDoc(docRef, {
@@ -72,6 +72,58 @@ import {updateProfile, updatePassword, signOut} from 'firebase/auth';
         alert('Account Updated Successfully!');
     }
 
+    const handleDeletePress = () => {
+      // 1. ask user for confirmation - DONE
+      // 2. delete user from firestore - 
+      // 3. delete user from firebase auth - 
+
+      setError("");
+      const docRef = doc(db, 'Users', auth.currentUser.uid)
+      const user = auth.currentUser;
+
+      Alert.alert(
+              'Delete Account Confirmation',
+              'Are you sure you want to delete your account Oober?',
+              [
+                {
+                  text: 'Cancel',
+                  onPress: () => { return null; },
+                  style: 'cancel',
+                },
+                {
+                    text: 'OK',
+                    onPress: () => {
+                      // LOGIC GOES HERE
+
+                      // Delete a user from firestore
+                      deleteUser(user).then(() => {
+                        // User deleted.
+                        alert ('Account Deleted Successfully!');
+                      }).catch((error) => {
+                        // An error ocurred
+                        alert ('An error occurred, please try again later.');
+                      });
+                      
+                      // Delete a user from firebase auth
+                      console.log(auth.currentUser.uid)
+                      deleteDoc(docRef)
+                      .then(() => {
+                          console.log("Entire Document has been deleted successfully.")
+                      })
+                      .catch(error => {
+                          console.log(error);
+                      })
+
+
+                      AsyncStorage.clear();
+                      navigation.replace('Auth');
+                    },
+                },
+              ],
+              { cancelable: false }
+            );
+    }
+
     return (
         <SafeAreaView style={styles.mainBody}>
             <ScrollView
@@ -85,8 +137,6 @@ import {updateProfile, updatePassword, signOut} from 'firebase/auth';
                       <Text style={styles.headerStyle}>Update Account</Text>
                       <Text style={styles.contentStyle}>Please fill in the fields you wish to change</Text>
                     </View>
-                    
-
                 <KeyboardAvoidingView enabled>
                     <View style={styles.sectionStyle}>
                         <TextInput
@@ -160,9 +210,18 @@ import {updateProfile, updatePassword, signOut} from 'firebase/auth';
                     ) : null}
                     <TouchableOpacity
                         style={styles.buttonStyle}
-                        activeOpacity={0.5}
+                        actirveOpacity={0.5}
                         onPress={() => handleSubmitPress()}>
                         <Text style={styles.buttonTextStyle}>Update Information</Text>
+                    </TouchableOpacity>
+
+                    {/* Delete Account  */}
+                    <TouchableOpacity
+                        style={styles.deleteButtonStyle}
+                        actirveOpacity={0.5}
+                        onPress={() => handleDeletePress()}>
+                        <Text style={styles.buttonTextStyle}>Delete Account</Text>
+                    
                     </TouchableOpacity>
                 </KeyboardAvoidingView>
             </ScrollView>
@@ -200,6 +259,19 @@ import {updateProfile, updatePassword, signOut} from 'firebase/auth';
             paddingVertical: 10,
             fontSize: 16,
             fontWeight: 'bold',
+        },
+        // Delete Account Button
+        deleteButtonStyle: {
+          backgroundColor: '#ff312e',
+          borderWidth: 0,
+          color: '#2b2b2b',
+          height: 43,
+          alignItems: 'center',
+          borderRadius: 30,
+          marginLeft: 35,
+          marginRight: 35,
+          marginTop: 20,
+          marginBottom: 20,
         },
         inputStyle: {
             flex: 1,
