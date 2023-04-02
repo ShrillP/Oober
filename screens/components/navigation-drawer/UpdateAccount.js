@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useState, createRef, useEffect } from "react";
-import { doc, updateDoc } from "firebase/firestore";
+import React, { useState, createRef } from "react";
+import { doc, updateDoc, getDoc } from "firebase/firestore";
 import {
   SafeAreaView,
   StyleSheet,
@@ -30,9 +30,18 @@ import {updateProfile, updatePassword, signOut} from 'firebase/auth';
     const emailInputRef = createRef();
     const passwordInputRef = createRef();
 
+    const docRef = doc(db, 'Users', auth.currentUser.uid);
+    const [oldFirstName, setOldFirstName] = useState('');
+    const [oldLastName, setOldLastName] = useState('');
+    const [oldAddress, setOldAddress] = useState('');
+    getDoc(docRef).then((docSnap) => {
+      setOldFirstName(docSnap.data().firstName);
+      setOldLastName(docSnap.data().lastName);
+      setOldAddress(docSnap.data().address);
+    });
+
     const handleSubmitPress = () => {
         setError("");
-        const docRef = doc(db, 'Users', auth.currentUser.uid);
         if (firstName) {
           updateDoc(docRef, {
             firstName: firstName
@@ -74,7 +83,7 @@ import {updateProfile, updatePassword, signOut} from 'firebase/auth';
             );
           }).catch((e) => {
             if (e.code === 'auth/weak-password') {
-              setError('Password is too weak!');
+              setError('Password was not changed since it was too weak!');
             } else {
               setError('Something went wrong, please try again later!');
             }
@@ -107,15 +116,13 @@ import {updateProfile, updatePassword, signOut} from 'firebase/auth';
                       <Text style={styles.headerStyle}>Update Account</Text>
                       <Text style={styles.contentStyle}>Please fill in the fields you wish to change</Text>
                     </View>
-                    
-
                 <KeyboardAvoidingView enabled>
                     <View style={styles.sectionStyle}>
                         <TextInput
                             style={styles.inputStyle}
                             onChangeText={firstName => setFirstName(firstName)}
                             underlineColorAndroid="#f000"
-                            placeholder="First Name"
+                            placeholder={"Current First Name: " + oldFirstName}
                             placeholderTextColor="#2b2b2b"
                             autoCapitalize="sentences"
                             returnKeyType="next"
@@ -132,7 +139,7 @@ import {updateProfile, updatePassword, signOut} from 'firebase/auth';
                             style={styles.inputStyle}
                             onChangeText={lastName => setLastName(lastName)}
                             underlineColorAndroid="#f000"
-                            placeholder="Last Name"
+                            placeholder={"Current Last Name: " + oldLastName}
                             placeholderTextColor="#2b2b2b"
                             autoCapitalize="sentences"
                             returnKeyType="next"
@@ -149,7 +156,7 @@ import {updateProfile, updatePassword, signOut} from 'firebase/auth';
                             style={styles.inputStyle}
                             onChangeText={address => setAddress(address)}
                             underlineColorAndroid="#f000"
-                            placeholder="Address"
+                            placeholder={"Current Address: " + oldAddress}
                             placeholderTextColor="#2b2b2b"
                             autoCapitalize="sentences"
                             returnKeyType="next"

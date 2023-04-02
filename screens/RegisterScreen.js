@@ -85,7 +85,7 @@ const RegisterScreen = ({ navigation }) => {
                 email: email,
                 uuid: user.user.uid,
             });
-            AsyncStorage.setItem('password', JSON.stringify(password));
+            AsyncStorage.setItem('password', password);
         })
         .catch((error) => {
             console.log(error);
