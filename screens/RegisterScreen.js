@@ -17,6 +17,7 @@ import { auth, db } from '../firebaseConfig';
 import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { AUTH_DOMAIN } from '@env';
+import { doc, setDoc } from 'firebase/firestore';
 
 const RegisterScreen = ({ navigation }) => {
     const [firstName, setFirstName] = useState('');
