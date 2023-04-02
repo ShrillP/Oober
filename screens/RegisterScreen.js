@@ -13,8 +13,9 @@ import {
   
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { auth } from '../firebaseConfig';
+import { auth, db } from '../firebaseConfig';
 import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 import { AUTH_DOMAIN } from '@env';
 
 const RegisterScreen = ({ navigation }) => {
@@ -89,6 +90,14 @@ const RegisterScreen = ({ navigation }) => {
         });
         updateProfile(auth.currentUser, {
             displayName: firstName,
+        });
+        setDoc(doc(db, 'Users', auth.currentUser.uid), {
+            firstName: firstName,
+            lastName: lastName,
+            age: age,
+            address: address,
+            email: email,
+            uuid: user.user.uid,
         });
     })};
 
