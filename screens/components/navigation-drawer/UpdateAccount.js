@@ -82,8 +82,11 @@ import {updateProfile, updatePassword, signOut} from 'firebase/auth';
                     alignContent: 'center',
                 }}>
                     <View>
-                      <Text>HELLO</Text>
+                      <Text style={styles.headerStyle}>Update Account</Text>
+                      <Text style={styles.contentStyle}>Please fill in the fields you wish to change</Text>
                     </View>
+                    
+
                 <KeyboardAvoidingView enabled>
                     <View style={styles.sectionStyle}>
                         <TextInput
@@ -215,6 +218,17 @@ import {updateProfile, updatePassword, signOut} from 'firebase/auth';
             textAlign: 'center',
             fontSize: 14,
         },
+        headerStyle:{
+          color: 'black',
+          fontWeight: 'bold',
+          fontSize: 36,
+          textAlign: 'center',
+        },
+        contentStyle:{
+          fontSize: 18,
+          textAlign: 'center',
+          paddingVertical: 15,
+        }
     }
     );
 
