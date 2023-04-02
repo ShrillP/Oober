@@ -65,17 +65,28 @@ const RegisterScreen = ({ navigation }) => {
             alert('Please fill in Password field!');
             return;
         }
-        AsyncStorage.setItem('password', JSON.stringify(password));
         createUserWithEmailAndPassword(auth, email, password) 
         .then((user) => {
             sendEmailVerification(user.user, {
                 handleCodeInApp: true,
                 url: `https://${AUTH_DOMAIN}`,
-            })
-            .then(() => {
+            }).then(() => {
                 alert('Registration successful! Email Verification Sent!');
                 navigation.navigate('LoginScreen');
-         })
+            });
+            updateProfile(auth.currentUser, {
+                displayName: firstName,
+            });
+            setDoc(doc(db, 'Users', auth.currentUser.uid), {
+                firstName: firstName,
+                lastName: lastName,
+                age: age,
+                address: address,
+                email: email,
+                uuid: user.user.uid,
+            });
+            AsyncStorage.setItem('password', JSON.stringify(password));
+        })
         .catch((error) => {
             console.log(error);
             if (error.code === 'auth/email-already-in-use') {
@@ -88,18 +99,7 @@ const RegisterScreen = ({ navigation }) => {
                 setError('Something went wrong, please try again later!');
             }
         });
-        updateProfile(auth.currentUser, {
-            displayName: firstName,
-        });
-        setDoc(doc(db, 'Users', auth.currentUser.uid), {
-            firstName: firstName,
-            lastName: lastName,
-            age: age,
-            address: address,
-            email: email,
-            uuid: user.user.uid,
-        });
-    })};
+    };
 
     return (
     <SafeAreaView style={styles.mainBody}>

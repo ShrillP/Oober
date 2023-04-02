@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useState, createRef } from "react";
+import React, { useState, createRef, useEffect } from "react";
 import { doc, updateDoc } from "firebase/firestore";
 import {
   SafeAreaView,
@@ -7,24 +7,21 @@ import {
   TextInput,
   View,
   Text,
-  Image,
   KeyboardAvoidingView,
   Keyboard,
   TouchableOpacity,
   ScrollView,
-  
+  Alert,
 } from "react-native";
-import { auth, db} from '../../../firebaseConfig';
+import { auth, db } from '../../../firebaseConfig';
 import {updateProfile, updatePassword, signOut} from 'firebase/auth';
 
   const UpdateScreen = ({ navigation }) => {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
-    const [age, setAge] = useState('');
     const [address, setAddress] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-
 
     const firstNameInputRef = createRef();
     const lastNameInputRef = createRef();
@@ -35,8 +32,7 @@ import {updateProfile, updatePassword, signOut} from 'firebase/auth';
 
     const handleSubmitPress = () => {
         setError("");
-        console.log(auth.currentUser.uid)
-        const docRef = doc(db, 'Users', auth.currentUser.uid)
+        const docRef = doc(db, 'Users', auth.currentUser.uid);
         if (firstName) {
           updateDoc(docRef, {
             firstName: firstName
@@ -57,20 +53,46 @@ import {updateProfile, updatePassword, signOut} from 'firebase/auth';
         }
         if (password){
           updatePassword(auth.currentUser, password).then(() => {
-            alert('Password updated!');
-          }).catch((error) => {
-              console.log(error);
+            Alert.alert(
+              'Password and account details updated!',
+              'Click OK to sign out and login with your new password.',
+              [
+                {
+                  text: 'OK',
+                  onPress: () => { 
+                    signOut(auth).then(() => {
+                      console.log('Signed out successfully.');
+                    }).catch((error) => {
+                      console.log('Error signing out: ' + error);
+                    });
+                    AsyncStorage.clear();
+                    navigation.replace('Auth');
+                   },
+                },
+              ],
+              { cancelable: false }
+            );
+          }).catch((e) => {
+            if (e.code === 'auth/weak-password') {
+              setError('Password is too weak!');
+            } else {
+              setError('Something went wrong, please try again later!');
+            }
           });
-          signOut(auth).then(() => {
-            console.log('Signed out successfully.');
-            }).catch((error) => {
-            console.log('Error signing out: ' + error);
-            });
-            AsyncStorage.clear();
-            navigation.replace('Auth');
+        } else {
+          Alert.alert(
+            'Account Updated',
+            'Your account has been updated successfully.',
+            [
+              {
+                text: 'OK',
+                onPress: () => { navigation.replace('HomeScreen') },
+              },
+            ],
+            { cancelable: false }
+          );
         }
-        alert('Account Updated Successfully!');
-    }
+    };
 
     return (
         <SafeAreaView style={styles.mainBody}>

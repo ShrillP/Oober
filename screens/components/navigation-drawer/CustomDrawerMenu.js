@@ -1,4 +1,4 @@
-import { StyleSheet, Text, Alert, Platform } from 'react-native';
+import { Alert } from 'react-native';
 import { auth } from '../../../firebaseConfig';
 import { signOut } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
