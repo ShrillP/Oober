@@ -15,6 +15,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { auth, db } from '../firebaseConfig';
 import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 import { AUTH_DOMAIN } from '@env';
 import { doc, setDoc } from 'firebase/firestore';
 
@@ -99,7 +100,6 @@ const RegisterScreen = ({ navigation }) => {
             email: email,
             uuid: user.user.uid,
         });
-
     })};
 
     return (
