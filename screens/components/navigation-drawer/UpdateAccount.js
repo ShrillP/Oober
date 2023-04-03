@@ -1,19 +1,17 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState, createRef, } from "react";
-import { doc, updateDoc, deleteDoc, } from "firebase/firestore";
+import { doc, updateDoc, deleteDoc, getDoc } from "firebase/firestore";
 import {
   SafeAreaView,
   StyleSheet,
   TextInput,
   View,
   Text,
-  Image,
   KeyboardAvoidingView,
   Keyboard,
   TouchableOpacity,
   ScrollView,
   Alert,
-  
 } from "react-native";
 import { auth, db} from '../../../firebaseConfig';
 import {updateProfile, updatePassword, signOut, deleteUser } from 'firebase/auth';
@@ -21,11 +19,9 @@ import {updateProfile, updatePassword, signOut, deleteUser } from 'firebase/auth
   const UpdateScreen = ({ navigation }) => {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
-    const [age, setAge] = useState('');
     const [address, setAddress] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-
 
     const firstNameInputRef = createRef();
     const lastNameInputRef = createRef();
@@ -34,9 +30,18 @@ import {updateProfile, updatePassword, signOut, deleteUser } from 'firebase/auth
     const emailInputRef = createRef();
     const passwordInputRef = createRef();
 
+    const docRef = doc(db, 'Users', auth.currentUser.uid);
+    const [oldFirstName, setOldFirstName] = useState('');
+    const [oldLastName, setOldLastName] = useState('');
+    const [oldAddress, setOldAddress] = useState('');
+    getDoc(docRef).then((docSnap) => {
+      setOldFirstName(docSnap.data().firstName);
+      setOldLastName(docSnap.data().lastName);
+      setOldAddress(docSnap.data().address);
+    });
+
     const handleSubmitPress = () => {
         setError("");
-        const docRef = doc(db, 'Users', auth.currentUser.uid)
         if (firstName) {
           updateDoc(docRef, {
             firstName: firstName
@@ -57,20 +62,46 @@ import {updateProfile, updatePassword, signOut, deleteUser } from 'firebase/auth
         }
         if (password){
           updatePassword(auth.currentUser, password).then(() => {
-            alert('Password updated!');
-          }).catch((error) => {
-              console.log(error);
+            Alert.alert(
+              'Password and account details updated!',
+              'Click OK to sign out and login with your new password.',
+              [
+                {
+                  text: 'OK',
+                  onPress: () => { 
+                    signOut(auth).then(() => {
+                      console.log('Signed out successfully.');
+                    }).catch((error) => {
+                      console.log('Error signing out: ' + error);
+                    });
+                    AsyncStorage.clear();
+                    navigation.replace('Auth');
+                   },
+                },
+              ],
+              { cancelable: false }
+            );
+          }).catch((e) => {
+            if (e.code === 'auth/weak-password') {
+              setError('Password was not changed since it was too weak!');
+            } else {
+              setError('Something went wrong, please try again later!');
+            }
           });
-          signOut(auth).then(() => {
-            console.log('Signed out successfully.');
-            }).catch((error) => {
-            console.log('Error signing out: ' + error);
-            });
-            AsyncStorage.clear();
-            navigation.replace('Auth');
+        } else {
+          Alert.alert(
+            'Account Updated',
+            'Your account has been updated successfully.',
+            [
+              {
+                text: 'OK',
+                onPress: () => { navigation.replace('HomeScreen') },
+              },
+            ],
+            { cancelable: false }
+          );
         }
-        alert('Account Updated Successfully!');
-    }
+    };
 
     const handleDeletePress = () => {
       // 1. ask user for confirmation - DONE
@@ -143,7 +174,7 @@ import {updateProfile, updatePassword, signOut, deleteUser } from 'firebase/auth
                             style={styles.inputStyle}
                             onChangeText={firstName => setFirstName(firstName)}
                             underlineColorAndroid="#f000"
-                            placeholder="First Name"
+                            placeholder={"Current First Name: " + oldFirstName}
                             placeholderTextColor="#2b2b2b"
                             autoCapitalize="sentences"
                             returnKeyType="next"
@@ -160,7 +191,7 @@ import {updateProfile, updatePassword, signOut, deleteUser } from 'firebase/auth
                             style={styles.inputStyle}
                             onChangeText={lastName => setLastName(lastName)}
                             underlineColorAndroid="#f000"
-                            placeholder="Last Name"
+                            placeholder={"Current Last Name: " + oldLastName}
                             placeholderTextColor="#2b2b2b"
                             autoCapitalize="sentences"
                             returnKeyType="next"
@@ -177,7 +208,7 @@ import {updateProfile, updatePassword, signOut, deleteUser } from 'firebase/auth
                             style={styles.inputStyle}
                             onChangeText={address => setAddress(address)}
                             underlineColorAndroid="#f000"
-                            placeholder="Address"
+                            placeholder={"Current Address: " + oldAddress}
                             placeholderTextColor="#2b2b2b"
                             autoCapitalize="sentences"
                             returnKeyType="next"
