@@ -13,7 +13,7 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import { auth, db} from '../../../firebaseConfig';
+import { auth, db } from '../../../firebaseConfig';
 import {updateProfile, updatePassword, signOut, deleteUser } from 'firebase/auth';
 
   const UpdateScreen = ({ navigation }) => {
@@ -104,17 +104,11 @@ import {updateProfile, updatePassword, signOut, deleteUser } from 'firebase/auth
     };
 
     const handleDeletePress = () => {
-      // 1. ask user for confirmation - DONE
-      // 2. delete user from firestore - 
-      // 3. delete user from firebase auth - 
-
       setError("");
-      const docRef = doc(db, 'Users', auth.currentUser.uid)
       const user = auth.currentUser;
-
       Alert.alert(
               'Delete Account Confirmation',
-              'Are you sure you want to delete your account Oober?',
+              'Are you sure you want to delete your Oober account?',
               [
                 {
                   text: 'Cancel',
@@ -124,36 +118,28 @@ import {updateProfile, updatePassword, signOut, deleteUser } from 'firebase/auth
                 {
                     text: 'OK',
                     onPress: () => {
-                      // LOGIC GOES HERE
-
                       // Delete a user from firestore
-                      deleteUser(user).then(() => {
-                        // User deleted.
-                        alert ('Account Deleted Successfully!');
-                      }).catch((error) => {
-                        // An error ocurred
-                        alert ('An error occurred, please try again later.');
-                      });
-                      
-                      // Delete a user from firebase auth
-                      console.log(auth.currentUser.uid)
                       deleteDoc(docRef)
                       .then(() => {
-                          console.log("Entire Document has been deleted successfully.")
+                        // Delete a user from firebase auth
+                        deleteUser(user).then(() => {
+                          AsyncStorage.clear();
+                          navigation.replace('Auth');
+                          alert ('Account Deleted Successfully!');
+                        }).catch((error) => {
+                          console.log(error);
+                        });
                       })
                       .catch(error => {
                           console.log(error);
-                      })
-
-
-                      AsyncStorage.clear();
-                      navigation.replace('Auth');
+                          alert ('Something went wrong, please try again later!');
+                      });
                     },
                 },
               ],
               { cancelable: false }
             );
-    }
+    };
 
     return (
         <SafeAreaView style={styles.mainBody}>
