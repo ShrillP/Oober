@@ -1,8 +1,9 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
-import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { GOOGLE_MAPS_API_KEY } from '@env';
+import MapViewDirections from 'react-native-maps-directions';
 
 const HomeScreen = () => {
     const [region, setRegion] = useState(
@@ -13,17 +14,40 @@ const HomeScreen = () => {
             longitudeDelta: 0.0421,
         }
     );
+    const [startLocation, setStartLocation] = useState(null); //Long and Lat
+    const [startLocationName, setStartLocationName] = useState(''); // Name of starting location
+    const [endLocation, setEndLocation] = useState(null); //Long and Lat
+    const [endLocationName, setEndLocationName] = useState(''); // Name of ending location
+    const mapRef = React.useRef(null);
+
+    const setStartingLocation = (data, details = null) => {
+        setStartLocationName(data.description);
+        setStartLocation({
+            longitude: details.geometry.location.lng,
+            latitude: details.geometry.location.lat,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+        });
+    };
+    const setEndingLocation = (data, details = null) => {
+        setEndLocationName(data.description);
+        setEndLocation({
+            longitude: details.geometry.location.lng,
+            latitude: details.geometry.location.lat,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+        });
+    };
+
     return (
         <View style={styles.mainBody}>
             <View style={styles.container}>
             <View style={{ position: 'absolute', width: '100%', zIndex: 9999, top: 10, alignItems: 'center' }}>
                 <GooglePlacesAutocomplete
                     istViewDisplayed='false'
+                    fetchDetails={true}
                     placeholder='Enter Starting Location'
-                    onPress={(data, details = null) => {
-                        console.log(data);
-                        console.log(details);
-                    }}
+                    onPress={setStartingLocation}
                     styles={{
                         textInputContainer: {
                             width: '90%',
@@ -56,6 +80,8 @@ const HomeScreen = () => {
                 <View style={{ position: 'absolute', width: '100%', zIndex: 100, top: 65, alignItems: 'center' }}>
                     <GooglePlacesAutocomplete
                     istViewDisplayed='false'
+                    fetchDetails={true}
+                    onPress={setEndingLocation}
                     placeholder='Enter Destination'
                     styles={{
                         textInputContainer: {
@@ -73,7 +99,43 @@ const HomeScreen = () => {
                     initialRegion={region}
                     animateToRegion={region}
                     onRegionChangeComplete={(region) => setRegion(region)}
+                    ref={mapRef}
                 >
+                    {startLocation && (
+                        <Marker
+                            coordinate={startLocation}
+                            title="Start Location"
+                            description={startLocationName}
+                            pinColor={'#5FD365'}
+                        />
+                    )}
+                    {endLocation && (
+                        <Marker
+                            coordinate={endLocation}
+                            title="End Location"
+                            description={endLocationName}
+                        />
+                    )}
+                    {startLocation && endLocation && (
+                        <MapViewDirections
+                            origin={startLocation}
+                            destination={endLocation}
+                            apikey={GOOGLE_MAPS_API_KEY}
+                            strokeWidth={5}
+                            strokeColor="blue"
+                        />
+                    )}
+                    {startLocation && endLocation && (
+                        mapRef.current.fitToCoordinates([startLocation, endLocation], {
+                            edgePadding: {
+                                right: 50,
+                                bottom: 50,
+                                left: 50,
+                                top: 150,
+                            },
+                            animated: true,
+                        })
+                    )}
                 </MapView>
             </View>
             <View style={styles.body}>
