@@ -1,17 +1,85 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import { GOOGLE_MAPS_API_KEY } from '@env';
 
 const HomeScreen = () => {
-  return (
-    <View style={styles.mainBody}>
-        <View style={styles.body}>
-            <Text>Stuff will go here</Text> 
+    const [region, setRegion] = useState(
+        {
+            latitude: 43.262920,
+            longitude: -79.919410,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+        }
+    );
+    return (
+        <View style={styles.mainBody}>
+            <View style={styles.container}>
+            <View style={{ position: 'absolute', width: '100%', zIndex: 9999, top: 10, alignItems: 'center' }}>
+                <GooglePlacesAutocomplete
+                    istViewDisplayed='false'
+                    placeholder='Enter Starting Location'
+                    onPress={(data, details = null) => {
+                        console.log(data);
+                        console.log(details);
+                    }}
+                    styles={{
+                        textInputContainer: {
+                            width: '90%',
+                            borderRadius: 5,
+                            marginHorizontal: 10,
+                        },
+                        listView: {
+                            backgroundColor: '#eee',
+                            borderRadius: 5,
+                            borderWidth: 1,
+                            borderColor: '#eee',
+                            marginHorizontal: 10,
+                            elevation: 3,
+                        },
+                        searchContainer: {
+                            flex: 1,
+                            width: '100%',
+                            justifyContent: 'center',
+                            top: 20,
+                            zIndex: 100,
+                            elevation: 3,
+                            paddingHorizontal: 15,
+                        },
+                    }} 
+                    query={{
+                        key: GOOGLE_MAPS_API_KEY,
+                    }}
+                    />
+                </View>
+                <View style={{ position: 'absolute', width: '100%', zIndex: 100, top: 65, alignItems: 'center' }}>
+                    <GooglePlacesAutocomplete
+                    istViewDisplayed='false'
+                    placeholder='Enter Destination'
+                    styles={{
+                        textInputContainer: {
+                            width: '90%',
+                            borderRadius: 5,
+                            marginHorizontal: 10,
+                        },
+                    }} 
+                    query={{
+                        key: GOOGLE_MAPS_API_KEY,
+                    }}
+                    />
+                </View>
+                <MapView provider={PROVIDER_GOOGLE} style={styles.map}
+                    initialRegion={region}
+                    animateToRegion={region}
+                    onRegionChangeComplete={(region) => setRegion(region)}
+                >
+                </MapView>
+            </View>
+            <View style={styles.body}>
+                <Text>Home Screen</Text>
+            </View>
         </View>
-        <View style={styles.container}>
-            <MapView provider={PROVIDER_GOOGLE} style={styles.map}/>
-        </View>
-    </View>
   );
 };
 
@@ -23,7 +91,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#A7A8A8',
     },
     body: {
-        flex: 0.5,
+        flex: 0.4,
         backgroundColor: '#A7A8A8',
         alignItems: 'center',
         justifyContent: 'center',
