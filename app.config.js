@@ -25,7 +25,8 @@ module.exports = {
         googleMaps: {
           apiKey: process.env.GOOGLE_MAPS_API_KEY
         }
-      }
+      },
+      softwareKeyboardLayoutMode: "pan"
     },
     web: {
       favicon: "./assets/appicon.png"

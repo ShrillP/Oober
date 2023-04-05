@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import HomeScreen from './components/navigation-drawer/HomeScreen';
 import UpdateAccount from './components/navigation-drawer/UpdateAccount';
+import CarpoolRequest from './components/CarpoolRequest';
 import { auth } from '../firebaseConfig';
 import CustomDrawerMenu from './components/navigation-drawer/CustomDrawerMenu';
 import IonIcons from '@expo/vector-icons/Ionicons';
@@ -35,7 +36,15 @@ const UpdateAccountStack = () => {
   );
 };
 
-const HomeScreenRouter = () => {
+const CarpoolRequestStack = () => {
+  return (
+    <Stack.Navigator initialRouteName='CarpoolRequest'>
+      <Stack.Screen name='CarpoolRequest' component={CarpoolRequest} options={{ headerShown: false}}/>
+    </Stack.Navigator>
+  );
+};
+
+const HomeScreenRouter = ({navigation}) => {
   return (
     <Drawer.Navigator 
       screenOptions={{
@@ -65,6 +74,23 @@ const HomeScreenRouter = () => {
             <IonIcons name='create' size={30} color='#2b2b2b' />
           ),
           headerTitle: 'Edit Account',
+          headerRight: () => (
+            <IonIcons.Button name='home' size={30} color='#2b2b2b' backgroundColor='#5FBAA7' onPress={() => navigation.navigate('Home Page')} />
+          ),
+        }}
+      />
+      <Drawer.Screen name='Carpool Request' component={CarpoolRequestStack}
+        options={{
+          drawerIcon: () => (
+            <IonIcons name='car-sport' size={30} color='#2b2b2b' />
+          ),
+          headerTitle: 'Carpool Request',
+          headerRight: () => (
+            <IonIcons.Button name='stop-circle-outline' size={30} color='#2b2b2b' backgroundColor='#5FBAA7' onPress={() => navigation.navigate('Home Page')} />
+          ),
+          drawerItemStyle: {
+            height: 0,
+          },
         }}
       />
     </Drawer.Navigator>

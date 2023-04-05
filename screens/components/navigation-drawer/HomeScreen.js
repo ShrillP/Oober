@@ -4,8 +4,9 @@ import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { GOOGLE_MAPS_API_KEY } from '@env';
 import MapViewDirections from 'react-native-maps-directions';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
-const HomeScreen = () => {
+const HomeScreen = ({navigation}) => {
     const [region, setRegion] = useState(
         {
             latitude: 43.262920,
@@ -18,6 +19,9 @@ const HomeScreen = () => {
     const [startLocationName, setStartLocationName] = useState(''); // Name of starting location
     const [endLocation, setEndLocation] = useState(null); //Long and Lat
     const [endLocationName, setEndLocationName] = useState(''); // Name of ending location
+    const [distance, setDistance] = useState(0); // Distance between start and end location
+    const [duration, setDuration] = useState(0); // Duration between start and end location
+    const [fare, setFare] = useState(0); // Fare between start and end location
     const mapRef = React.useRef(null);
 
     const setStartingLocation = (data, details = null) => {
@@ -29,6 +33,7 @@ const HomeScreen = () => {
             longitudeDelta: 0.0421,
         });
     };
+
     const setEndingLocation = (data, details = null) => {
         setEndLocationName(data.description);
         setEndLocation({
@@ -37,6 +42,23 @@ const HomeScreen = () => {
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
         });
+    };
+
+    const handleRequestCarpool = () => {
+        if (startLocation == null) {
+            alert('Please enter a starting location!');
+        }
+        if (endLocation == null) {
+            alert('Please enter a destination!');
+        }
+        if (startLocation != null && endLocation != null) {
+            navigation.navigate('CarpoolRequest', {
+                startLocation: startLocation,
+                startLocationName: startLocationName,
+                endLocation: endLocation,
+                endLocationName: endLocationName,
+            });
+        }
     };
 
     return (
@@ -48,6 +70,14 @@ const HomeScreen = () => {
                     fetchDetails={true}
                     placeholder='Enter Starting Location'
                     onPress={setStartingLocation}
+                    textInputProps={{
+                        onChangeText: (text) => {
+                            if (!text) {
+                                setStartLocation(null);
+                            }
+                            setStartLocationName(text);
+                        },
+                    }}
                     styles={{
                         textInputContainer: {
                             width: '90%',
@@ -75,6 +105,7 @@ const HomeScreen = () => {
                     query={{
                         key: GOOGLE_MAPS_API_KEY,
                     }}
+                    enablePoweredByContainer={false}
                     />
                 </View>
                 <View style={{ position: 'absolute', width: '100%', zIndex: 100, top: 65, alignItems: 'center' }}>
@@ -83,6 +114,14 @@ const HomeScreen = () => {
                     fetchDetails={true}
                     onPress={setEndingLocation}
                     placeholder='Enter Destination'
+                    textInputProps={{
+                        onChangeText: (text) => {
+                            if (!text) {
+                                setEndLocation(null);
+                            }
+                            setEndLocationName(text);
+                        },
+                    }}
                     styles={{
                         textInputContainer: {
                             width: '90%',
@@ -93,6 +132,7 @@ const HomeScreen = () => {
                     query={{
                         key: GOOGLE_MAPS_API_KEY,
                     }}
+                    enablePoweredByContainer={false}
                     />
                 </View>
                 <MapView provider={PROVIDER_GOOGLE} style={styles.map}
@@ -101,21 +141,21 @@ const HomeScreen = () => {
                     onRegionChangeComplete={(region) => setRegion(region)}
                     ref={mapRef}
                 >
-                    {startLocation && (
+                    {startLocation ? (
                         <Marker
                             coordinate={startLocation}
                             title="Start Location"
                             description={startLocationName}
                             pinColor={'#5FD365'}
                         />
-                    )}
-                    {endLocation && (
+                    ) : null}
+                    {endLocation ? (
                         <Marker
                             coordinate={endLocation}
                             title="End Location"
                             description={endLocationName}
                         />
-                    )}
+                    ) : null}
                     {startLocation && endLocation && (
                         <MapViewDirections
                             origin={startLocation}
@@ -123,6 +163,14 @@ const HomeScreen = () => {
                             apikey={GOOGLE_MAPS_API_KEY}
                             strokeWidth={5}
                             strokeColor="blue"
+                            onReady={(result) => {
+                                const baseFare = 4.90;
+                                console.log(startLocation);
+                                console.log(endLocation);
+                                setDistance(result.distance);
+                                setDuration(result.duration);
+                                setFare(baseFare + (1.8 * result.distance));
+                            }}
                         />
                     )}
                     {startLocation && endLocation && (
@@ -138,9 +186,22 @@ const HomeScreen = () => {
                     )}
                 </MapView>
             </View>
-            <View style={styles.body}>
-                <Text>Home Screen</Text>
+            <Text style={styles.tripInfoHeaderText}>Trip Information</Text>
+            <View style={{flex: 0.15, justifyContent: 'center', alignItems: 'center'}}>
+                <View style={styles.tripInfoRow}>
+                    <Text style={styles.tripInfoText}>Distance: {distance ? distance.toFixed(2) : 0} km</Text>
+                    <Text style={styles.tripInfoText}>Duration: {duration ? duration.toFixed(0) : 0} min</Text>
+                    <Text style={styles.tripInfoText}>Fare: ${fare ? fare.toFixed(2) : 0}</Text>
+                </View>
             </View>
+            <TouchableOpacity style={styles.buttonStyle}
+                onPress={handleRequestCarpool}
+            >
+                <Text style={styles.buttonTextStyle}>Request Carpool</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.buttonStyle}>
+                <Text style={styles.buttonTextStyle}>Offer Carpool</Text>
+            </TouchableOpacity>
         </View>
   );
 };
@@ -153,10 +214,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#A7A8A8',
     },
     body: {
-        flex: 0.4,
+        flex: 0.3,
         backgroundColor: '#A7A8A8',
         alignItems: 'center',
-        justifyContent: 'center',
     },
     header: {
         flexDirection: 'row',
@@ -180,5 +240,47 @@ const styles = StyleSheet.create({
         flex: 1,
         width: '100%',
         height: '100%',
+    },
+    buttonStyle: {
+        backgroundColor: '#5FBAA7',
+        borderWidth: 0,
+        color: '#2b2b2b',
+        height: 43,
+        alignItems: 'center',
+        borderRadius: 10,
+        marginLeft: 10,
+        marginRight: 10,
+        marginTop: 10,
+        marginBottom: 10,
+    },
+    buttonTextStyle: {
+        color: '#2b2b2b',
+        paddingVertical: 10,
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    tripInfoHeaderText: {
+        color: '#2b2b2b',
+        fontSize: 30,
+        fontWeight: 'bold',
+        justifyContent: 'center',
+        alignItems: 'center',
+        textAlign: 'center',
+        paddingTop: 5,
+    },
+    tripInfoRow: {
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+    },
+    tripInfoText: {
+        color: '#2b2b2b',
+        fontSize: 20,
+        fontWeight: 'bold',
+        justifyContent: 'center',
+        alignItems: 'center',
+        textAlign: 'center',
+        paddingTop: 5,
     },
 });
