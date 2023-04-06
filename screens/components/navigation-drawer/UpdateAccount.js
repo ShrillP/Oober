@@ -231,14 +231,11 @@ import {updateProfile, updatePassword, signOut, deleteUser } from 'firebase/auth
                         onPress={() => handleSubmitPress()}>
                         <Text style={styles.buttonTextStyle}>Update Information</Text>
                     </TouchableOpacity>
-
-                    {/* Delete Account  */}
                     <TouchableOpacity
                         style={styles.deleteButtonStyle}
                         actirveOpacity={0.5}
                         onPress={() => handleDeletePress()}>
                         <Text style={styles.buttonTextStyle}>Delete Account</Text>
-                    
                     </TouchableOpacity>
                 </KeyboardAvoidingView>
             </ScrollView>
