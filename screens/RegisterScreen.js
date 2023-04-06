@@ -84,6 +84,9 @@ const RegisterScreen = ({ navigation }) => {
                 address: address,
                 email: email,
                 uuid: user.user.uid,
+                savedEmissions: 0,
+                tripsTaken: [],
+                rating: 0,
             });
             AsyncStorage.setItem('password', password);
         })

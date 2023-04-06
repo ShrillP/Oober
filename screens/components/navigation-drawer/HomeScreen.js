@@ -45,17 +45,16 @@ const HomeScreen = ({navigation}) => {
     };
 
     const handleRequestCarpool = () => {
-        if (startLocation == null) {
-            alert('Please enter a starting location!');
-        }
-        if (endLocation == null) {
-            alert('Please enter a destination!');
+        if (startLocation == null || endLocation == null) {
+            alert('Please enter a starting location and destination!');
         }
         if (startLocation != null && endLocation != null) {
-            navigation.navigate('CarpoolRequest', {
-                startLocation: startLocation,
+            navigation.navigate('Carpool Request', {
+                startLat: startLocation.latitude,
+                startLong: startLocation.longitude,
                 startLocationName: startLocationName,
-                endLocation: endLocation,
+                endLat: endLocation.latitude,
+                endLong: endLocation.longitude,
                 endLocationName: endLocationName,
             });
         }
@@ -165,8 +164,6 @@ const HomeScreen = ({navigation}) => {
                             strokeColor="blue"
                             onReady={(result) => {
                                 const baseFare = 4.90;
-                                console.log(startLocation);
-                                console.log(endLocation);
                                 setDistance(result.distance);
                                 setDuration(result.duration);
                                 setFare(baseFare + (1.8 * result.distance));
