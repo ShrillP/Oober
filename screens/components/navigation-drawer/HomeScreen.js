@@ -7,6 +7,7 @@ import MapViewDirections from 'react-native-maps-directions';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const HomeScreen = ({navigation}) => {
+    const forceUpdate = React.useCallback(() => updateState({}), []);
     const [region, setRegion] = useState(
         {
             latitude: 43.262920,

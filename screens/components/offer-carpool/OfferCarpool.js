@@ -1,10 +1,12 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Alert } from 'react-native';
 import React, { useState, useRef } from 'react'
 import { GOOGLE_MAPS_API_KEY } from '@env';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import Slider from '@react-native-community/slider';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { collection, getCountFromServer, doc, setDoc, GeoPoint } from 'firebase/firestore';
+import { auth, db } from '../../../firebaseConfig';
 
 const OfferCarpool = ({ route, navigation }) => {
   const {
@@ -21,8 +23,68 @@ const OfferCarpool = ({ route, navigation }) => {
   const mapRef = useRef(null);
   const [maxPassengerSliderValue, setMaxPassengerSliderValue] = useState(0);
 
-  const handleOfferSubmission = () => {};
-
+  const handleOfferSubmission = async () => {
+    const carpoolData = await getCountFromServer(collection(db, 'AvailableCarpools'));
+    const carpoolID = 'carpool' + (carpoolData.data().count + 1);
+    Alert.alert(
+      'Offering Carpool',
+      'Are you sure you want to offer this carpool?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => { },
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => {
+            try {
+              setDoc(doc(db, 'AvailableCarpools', carpoolID), {
+                id: carpoolID,
+                activeCarpoolers: [auth.currentUser.displayName],
+                maxPassengers: maxPassengerSliderValue + 1,
+                isActive: true,
+                isFull: false,
+                fare: fare,
+                distance: distance,
+                totalEmissions: (186 * distance).toFixed(2),
+                startingPoint: new GeoPoint(startLat, startLong),
+                endingPoint: new GeoPoint(endLat, endLong),
+              });
+              navigation.replace('HomeScreen');
+              Alert.alert(
+                'Carpool Offered',
+                'Your carpool has been offered successfully!',
+                [
+                  {
+                    text: 'OK',
+                    onPress: () => { },
+                    style: 'cancel',
+                  },
+                ],
+                { cancelable: false }
+              );
+            } catch (error) {
+              console.log(error);
+              Alert.alert(
+                'Error',
+                'There was an error offering your carpool. Please try again.',
+                [
+                  {
+                    text: 'OK',
+                    onPress: () => { },
+                    style: 'cancel',
+                  },
+                ],
+                { cancelable: false }
+              );
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
 
   return (
     <View style={styles.mainBody}>
@@ -76,7 +138,7 @@ const OfferCarpool = ({ route, navigation }) => {
           <Text style={{fontWeight: 'bold'}}>Distance: </Text>{distance.toFixed(2)} km
         </Text>
         <Text style={styles.tripInfo}>
-          <Text style={{fontWeight: 'bold'}}>Duration: </Text>{duration.toFixed(2)} min
+          <Text style={{fontWeight: 'bold'}}>Duration: </Text>{duration.toFixed(0)} min
         </Text>
         <Text style={styles.tripInfo}>
           <Text style={{fontWeight: 'bold'}}>Your Estimated Fare: </Text>${(fare / (maxPassengerSliderValue + 1)).toFixed(2)}
