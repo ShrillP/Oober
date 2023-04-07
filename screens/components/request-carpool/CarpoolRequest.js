@@ -31,7 +31,7 @@ const CarpoolRequest = ({ route, navigation }) => {
                   updateDoc(carpoolRef, {
                     activeCarpoolers: arrayUnion(auth.currentUser.displayName),
                     isFull: carpoolSelected.activeCarpoolers.length + 1 === carpoolSelected.maxPassengers,
-                    isActive: false,
+                    isActive: carpoolSelected.activeCarpoolers.length + 1 === carpoolSelected.maxPassengers ? false : true,
                   });
                   const userRef = doc(db, 'Users', auth.currentUser.uid);
                   updateDoc(userRef, {
