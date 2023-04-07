@@ -8,6 +8,7 @@ import { auth, db } from '../../../firebaseConfig';
 import { ScrollView } from 'react-native-gesture-handler';
 
 const CarpoolRequest = ({ route, navigation }) => {
+  const forceUpdate = React.useCallback(() => updateState({}), []);
   const mapRef = useRef(null);
   const { startLat, startLong, startLocationName, endLat, endLong, endLocationName } = route.params;
   const [carpools, setCarpools] = useState([]);
@@ -111,17 +112,15 @@ const CarpoolRequest = ({ route, navigation }) => {
       </View>
       <Text style={styles.pageTitle}>Available Carpools from {startLocationName.split(',')[0]} to {endLocationName.split(',')[0]}</Text>
       <ScrollView style={styles.scrollContainer}>
-      {carpools.map((carpool, index) => {
-        if (!carpool.isFull && carpool.isActive) {
-          return (
-            <TouchableOpacity key={index} style={styles.availCarpoolContainer} onPress={() => { handleRequestCarpool(carpool); }}>
-              <Text style={styles.carpoolInfoTextTitle}>Carpool {index + 1}</Text>
-              <Text style={styles.carpoolInfoText}>Your Fare: ${(carpool.fare / (carpool.activeCarpoolers.length + 1)).toFixed(2)}</Text>
-              <Text style={styles.carpoolInfoText}>Seats Available: {carpool.maxPassengers - carpool.activeCarpoolers.length}</Text>
-              <Text style={styles.carpoolInfoText}>Emissions Saved: {(carpool.totalEmissions - (carpool.totalEmissions / (carpool.activeCarpoolers.length + 1))).toFixed(2)} g CO2e/km</Text>
-            </TouchableOpacity>
-          );
-        }
+      {carpools.filter(carpool => (!carpool.isFull && carpool.isActive)).map((carpool, index) => {
+        return (
+          <TouchableOpacity key={index} style={styles.availCarpoolContainer} onPress={() => { handleRequestCarpool(carpool); }}>
+            <Text style={styles.carpoolInfoTextTitle}>Carpool {index + 1}</Text>
+            <Text style={styles.carpoolInfoText}>Your Fare: ${(carpool.fare / (carpool.activeCarpoolers.length + 1)).toFixed(2)}</Text>
+            <Text style={styles.carpoolInfoText}>Seats Available: {carpool.maxPassengers - carpool.activeCarpoolers.length}</Text>
+            <Text style={styles.carpoolInfoText}>Emissions Saved: {(carpool.totalEmissions - (carpool.totalEmissions / (carpool.activeCarpoolers.length + 1))).toFixed(2)} g CO2e/km</Text>
+          </TouchableOpacity>
+        );
         })}
         {(carpools.length === 0 || carpools.filter(carpool => carpool.isActive === true).length === 0) && 
           <Text style={styles.noAvailableCarpools}>There are no available carpools with your desired starting and ending locations.</Text>
