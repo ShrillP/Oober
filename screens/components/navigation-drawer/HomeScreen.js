@@ -60,6 +60,25 @@ const HomeScreen = ({navigation}) => {
         }
     };
 
+    const handleOfferCarpool = () => {
+        if (startLocation == null || endLocation == null) {
+            alert('Please enter a starting location and destination!');
+        }
+        if (startLocation != null && endLocation != null) {
+            navigation.navigate('Scan QR Code', {
+                startLat: startLocation.latitude,
+                startLong: startLocation.longitude,
+                startLocationName: startLocationName,
+                endLat: endLocation.latitude,
+                endLong: endLocation.longitude,
+                endLocationName: endLocationName,
+                distance: distance,
+                duration: duration,
+                fare: fare,
+            });
+        }
+    };
+
     return (
         <View style={styles.mainBody}>
             <View style={styles.container}>
@@ -191,12 +210,10 @@ const HomeScreen = ({navigation}) => {
                     <Text style={styles.tripInfoText}>Fare: ${fare ? fare.toFixed(2) : 0}</Text>
                 </View>
             </View>
-            <TouchableOpacity style={styles.buttonStyle}
-                onPress={handleRequestCarpool}
-            >
+            <TouchableOpacity style={styles.buttonStyle} onPress={handleRequestCarpool}>
                 <Text style={styles.buttonTextStyle}>Request Carpool</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonStyle}>
+            <TouchableOpacity style={styles.buttonStyle} onPress={handleOfferCarpool}>
                 <Text style={styles.buttonTextStyle}>Offer Carpool</Text>
             </TouchableOpacity>
         </View>

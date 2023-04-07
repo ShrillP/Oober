@@ -10,6 +10,8 @@ import CarpoolRequest from './components/request-carpool/CarpoolRequest';
 import CarpoolCompleted from './components/request-carpool/CarpoolCompleted';
 import CustomDrawerMenu from './components/navigation-drawer/CustomDrawerMenu';
 import RideHistory from './components/navigation-drawer/RideHistory';
+import ScanQRCode from './components/offer-carpool/ScanQRCode';
+import OfferCarpool from './components/offer-carpool/OfferCarpool';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -68,6 +70,37 @@ const HomeStack = ({navigation}) => {
           <IonIcons.Button name='home' size={30} color='#2b2b2b' backgroundColor='#5FBAA7' onPress={() => navigation.popToTop()} />
         ),
       }}/>
+      <Stack.Screen name='Scan QR Code' component={ScanQRCode} options={{
+        headerTitle: 'Scan QR Code',
+        headerTitleAlign: 'center',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+        headerStyle: {
+          backgroundColor: '#5FBAA7',
+        },
+        headerTintColor: '#2b2b2b',
+        headerLeft: () => (
+          <IonIcons.Button name='arrow-back' size={30} color='#2b2b2b' backgroundColor='#5FBAA7' onPress={() => navigation.goBack()} />
+        ),
+      }}/>
+      <Stack.Screen name='Offer Carpool' component={OfferCarpool} options={{
+        headerTitle: 'Offer Carpool',
+        headerTitleAlign: 'center',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+        headerStyle: {
+          backgroundColor: '#5FBAA7',
+        },
+        headerTintColor: '#2b2b2b',
+        headerLeft: () => (
+          <IonIcons.Button name='arrow-back' size={30} color='#2b2b2b' backgroundColor='#5FBAA7' onPress={() => navigation.goBack()} />
+        ),
+        headerRight: () => (
+          <IonIcons.Button name='home' size={30} color='#2b2b2b' backgroundColor='#5FBAA7' onPress={() => navigation.popToTop()} />
+        ),
+      }}/>
     </Stack.Navigator>
   );
 };
@@ -123,6 +156,44 @@ const RideHistoryStack = ({navigation}) => {
   );
 };
 
+const OfferCarpoolStack = ({navigation}) => {
+  return (
+    <Stack.Navigator initialRouteName='OfferCarpool'>
+      <Stack.Screen name='ScanQRCode' component={ScanQRCode} options={{
+        headerTitle: 'Scan QR Code',
+        headerTitleAlign: 'center',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+        headerStyle: {
+          backgroundColor: '#5FBAA7',
+        },
+        headerTintColor: '#2b2b2b',
+        headerLeft: () => (
+          <IonIcons.Button name='arrow-back' size={30} color='#2b2b2b' backgroundColor='#5FBAA7' onPress={() => navigation.goBack()} />
+        ),
+        headerRight: () => (
+          <IonIcons.Button name='home' size={30} color='#2b2b2b' backgroundColor='#5FBAA7' onPress={() => navigation.popToTop()} />
+        ),
+      }}/>
+      <Stack.Screen name='OfferCarpool' component={OfferCarpool} options={{
+        headerTitle: 'Offer Carpool',
+        headerTitleAlign: 'center',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+        headerStyle: {
+          backgroundColor: '#5FBAA7',
+        },
+        headerTintColor: '#2b2b2b',
+        headerLeft: () => (
+          <IonIcons.Button name='arrow-back' size={30} color='#2b2b2b' backgroundColor='#5FBAA7' onPress={() => navigation.goBack()} />
+        ),
+      }}/>
+    </Stack.Navigator>
+  );
+};
+
 const HomeScreenRouter = ({navigation}) => {
   return (
     <Drawer.Navigator 
@@ -157,6 +228,13 @@ const HomeScreenRouter = ({navigation}) => {
         }}
       />
       <Drawer.Screen name='Carpool Completed' component={CarpoolRequestStack}
+        options={{
+          drawerItemStyle: {
+            height: 0,
+          },
+        }}
+      />
+      <Drawer.Screen name='Offer Carpool' component={OfferCarpoolStack}
         options={{
           drawerItemStyle: {
             height: 0,
