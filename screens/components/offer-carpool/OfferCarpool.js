@@ -37,9 +37,9 @@ const OfferCarpool = ({ route, navigation }) => {
         },
         {
           text: 'OK',
-          onPress: () => {
+          onPress: async () => {
             try {
-              setDoc(doc(db, 'AvailableCarpools', carpoolID), {
+              await setDoc(doc(db, 'AvailableCarpools', carpoolID), {
                 id: carpoolID,
                 activeCarpoolers: [auth.currentUser.displayName],
                 maxPassengers: maxPassengerSliderValue + 1,
@@ -47,14 +47,14 @@ const OfferCarpool = ({ route, navigation }) => {
                 isFull: false,
                 fare: fare,
                 distance: distance,
-                totalEmissions: (186 * distance).toFixed(2),
+                totalEmissions: Number((186 * distance).toFixed(2)),
                 startingPoint: new GeoPoint(startLat, startLong),
-                endingPoint: new GeoPoint(endLat, endLong),
+                endPoint: new GeoPoint(endLat, endLong),
               });
               navigation.replace('HomeScreen');
               Alert.alert(
                 'Carpool Offered',
-                'Your carpool has been offered successfully!',
+                'Your carpool has been offered successfully! Enjoy your carpool!',
                 [
                   {
                     text: 'OK',

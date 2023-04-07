@@ -61,7 +61,7 @@ const HomeScreen = ({navigation}) => {
         }
     };
 
-    const handleOfferCarpool = () => {
+    const handleOfferCarpool = async () => {
         if (startLocation == null || endLocation == null) {
             alert('Please enter a starting location and destination!');
         }
