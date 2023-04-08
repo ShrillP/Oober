@@ -6,6 +6,7 @@ import UpdateAccount from './components/navigation-drawer/UpdateAccount';
 import { auth } from '../firebaseConfig';
 import CustomDrawerMenu from './components/navigation-drawer/CustomDrawerMenu';
 import IonIcons from '@expo/vector-icons/Ionicons';
+import CustomerReview from './components/navigation-drawer/CustomerReview';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -34,6 +35,15 @@ const UpdateAccountStack = () => {
     </Stack.Navigator>
   );
 };
+
+const CustomerReviewStack = () => {
+  return (
+    <Stack.Navigator initialRouteName='CustomerReview'>
+      <Stack.Screen name='CustomerReview' component={CustomerReview} options={{ headerShown: false}}/>
+    </Stack.Navigator>
+  );
+};
+
 
 const HomeScreenRouter = () => {
   return (
@@ -67,6 +77,14 @@ const HomeScreenRouter = () => {
           headerTitle: 'Edit Account',
         }}
       />
+      <Drawer.Screen name='Customer Review' component={CustomerReviewStack}
+        options={{
+          drawerIcon: () => (
+            <IonIcons name='create' size={30} color='#2b2b2b' />
+          ),
+          headerTitle: 'Customer Review',
+        }}
+        />
     </Drawer.Navigator>
   );
 };
