@@ -29,6 +29,7 @@ import firestore from '@react-native-firebase/firestore';
 
     const currUser = auth.currentUser.displayName;
     const docRefCarpool= doc(db, 'activeCarpools','Carpool1')
+    const [range, setRange]= useState('')
     const [carpoolRiders, setCarpoolRiders]= useState([]);
     getDoc(docRefCarpool).then((docSnap) => {
       setCarpoolRiders(docSnap.data().activeCarpoolers);
@@ -37,17 +38,20 @@ import firestore from '@react-native-firebase/firestore';
 
     
     const handleSubmitPress = () => {
-      console.log(auth.currentUser.uid)
-      console.log(currUser)
-      console.log(carpoolRiders.length)
-      console.log(JSON.stringify(carpoolRiders))
-      const docRef = doc(db, 'Users ', auth.currentUser.uid)
+      console.log("rated John:" + range)
+      const docRef = doc(db, 'Users', '12345')
+      getDoc(docRef).then((doc) => {
+        const currentRating = doc.data().Rating;
+        console.log('Current rating:', currentRating);
+        updateDoc(docRef, {
+          Rating: (currentRating + range)/2
+        });
+      })
     }
-
 
     return (
       <ScrollView>
-        {carpoolRiders.filter(rider => rider.Name != auth.currentUser.displayName).map((item, index))} (
+        {carpoolRiders.map((item, index) => (
         <View key={index}>
             <Text style={styles.contentStyle}>Please provide a customer review for {item.Name} based on your experience</Text>
                   <Rating
@@ -56,18 +60,10 @@ import firestore from '@react-native-firebase/firestore';
                     startingValue={0}
                     imageSize={60}
                     showRating
-                    onFinishRating={(value) =>{
-                          setCarpoolRiders(carpoolRiders.map((user, i) => {
-                          if (i === index){
-                            return {...user, rating: value}
-                          }
-                          return user
-                        })
-                      )
-                   }}
+                    onFinishRating={(value) => setRange(value)}
                   />
           </View>
-      )
+      ))}
        <TouchableOpacity
               style={styles.buttonStyle}
               activeOpacity={0.5}
