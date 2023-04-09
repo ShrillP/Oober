@@ -51,9 +51,8 @@ import firestore from '@react-native-firebase/firestore';
 
     return (
       <ScrollView>
-        {carpoolRiders.map((item, index) => (
-        <View key={index}>
-            <Text style={styles.contentStyle}>Please provide a customer review for {item.Name} based on your experience</Text>
+        <View >
+            <Text style={styles.contentStyle}>Please provide a customer review for John based on your experience</Text>
                   <Rating
                     type='star'
                     ratingCount={5}
@@ -63,7 +62,6 @@ import firestore from '@react-native-firebase/firestore';
                     onFinishRating={(value) => setRange(value)}
                   />
           </View>
-      ))}
        <TouchableOpacity
               style={styles.buttonStyle}
               activeOpacity={0.5}
