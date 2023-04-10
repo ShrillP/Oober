@@ -41,7 +41,10 @@ const OfferCarpool = ({ route, navigation }) => {
             try {
               await setDoc(doc(db, 'AvailableCarpools', carpoolID), {
                 id: carpoolID,
-                activeCarpoolers: [auth.currentUser.displayName],
+                activeCarpoolers: {
+                  name: auth.currentUser.displayName,
+                  uid: auth.currentUser.uid,
+                },
                 maxPassengers: maxPassengerSliderValue + 1,
                 isActive: true,
                 isFull: false,
