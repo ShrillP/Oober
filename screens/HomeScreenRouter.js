@@ -7,7 +7,7 @@ import IonIcons from '@expo/vector-icons/Ionicons';
 import HomeScreen from './components/navigation-drawer/HomeScreen';
 import UpdateAccount from './components/navigation-drawer/UpdateAccount';
 import CarpoolRequest from './components/request-carpool/CarpoolRequest';
-import CarpoolCompleted from './components/request-carpool/CarpoolCompleted';
+import RiderReview from './components/request-carpool/RiderReview';
 import CustomDrawerMenu from './components/navigation-drawer/CustomDrawerMenu';
 import RideHistory from './components/navigation-drawer/RideHistory';
 import ScanQRCode from './components/offer-carpool/ScanQRCode';
@@ -56,8 +56,8 @@ const HomeStack = ({navigation}) => {
           <IonIcons.Button name='arrow-back' size={30} color='#2b2b2b' backgroundColor='#5FBAA7' onPress={() => navigation.goBack()} />
         ),
       }}/>
-      <Stack.Screen name='Carpool Completed' component={CarpoolCompleted} options={{
-        headerTitle: 'Carpool Completed',
+      <Stack.Screen name='Rider Ratings' component={RiderReview} options={{
+        headerTitle: 'Rate Riders',
         headerTitleAlign: 'center',
         headerTitleStyle: {
           fontWeight: 'bold',
@@ -130,7 +130,7 @@ const CarpoolRequestStack = () => {
   return (
     <Stack.Navigator initialRouteName='CarpoolRequest'>
       <Stack.Screen name='CarpoolRequest' component={CarpoolRequest} options={{ headerShown: false}}/>
-      <Stack.Screen name='Carpool Completed' component={CarpoolCompleted} options={{ headerShown: false}}/>
+      <Stack.Screen name='Rider Ratings' component={RiderReview} options={{ headerShown: false}}/>
     </Stack.Navigator>
   );
 };
@@ -227,7 +227,7 @@ const HomeScreenRouter = ({navigation}) => {
           },
         }}
       />
-      <Drawer.Screen name='Carpool Completed' component={CarpoolRequestStack}
+      <Drawer.Screen name='Rider Ratings' component={OfferCarpoolStack}
         options={{
           drawerItemStyle: {
             height: 0,

@@ -30,22 +30,28 @@ const CarpoolRequest = ({ route, navigation }) => {
                 if (carpoolSelected) {
                   const carpoolRef = doc(db, 'AvailableCarpools', carpoolSelected.id);
                   updateDoc(carpoolRef, {
-                    activeCarpoolers: arrayUnion(auth.currentUser.displayName),
+                    activeCarpoolers: arrayUnion({
+                      name: auth.currentUser.displayName,
+                      uid: auth.currentUser.uid,
+                    }),
                     isFull: carpoolSelected.activeCarpoolers.length + 1 === carpoolSelected.maxPassengers,
                     isActive: carpoolSelected.activeCarpoolers.length + 1 === carpoolSelected.maxPassengers ? false : true,
                   });
-                  const userRef = doc(db, 'Users', auth.currentUser.uid);
-                  updateDoc(userRef, {
-                    tripsTaken: arrayUnion({
-                      id: carpoolSelected.id,
-                      startName: startLocationName,
-                      endName: endLocationName,
-                      fare: carpoolSelected.fare / (carpoolSelected.activeCarpoolers.length + 1),
-                      emissionsSaved: carpoolSelected.totalEmissions - (carpoolSelected.totalEmissions / (carpoolSelected.activeCarpoolers.length + 1)),
-                    }),
-                    savedEmissions: increment(carpoolSelected.totalEmissions - (carpoolSelected.totalEmissions / (carpoolSelected.activeCarpoolers.length + 1))),
+                  // TODO: move this to be done after the rider ratings screen
+                  // const userRef = doc(db, 'Users', auth.currentUser.uid);
+                  // updateDoc(userRef, {
+                  //   tripsTaken: arrayUnion({
+                  //     id: carpoolSelected.id,
+                  //     startName: startLocationName,
+                  //     endName: endLocationName,
+                  //     fare: carpoolSelected.fare / (carpoolSelected.activeCarpoolers.length + 1),
+                  //     emissionsSaved: carpoolSelected.totalEmissions - (carpoolSelected.totalEmissions / (carpoolSelected.activeCarpoolers.length + 1)),
+                  //   }),
+                  //   savedEmissions: increment(carpoolSelected.totalEmissions - (carpoolSelected.totalEmissions / (carpoolSelected.activeCarpoolers.length + 1))),
+                  // });
+                  navigation.navigate('Rider Ratings', { 
+                    carpoolID: carpoolSelected.id,
                   });
-                  navigation.navigate('Carpool Completed');
                 }
               } catch (error) {
                 console.log(error);
