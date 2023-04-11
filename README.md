@@ -58,3 +58,30 @@ Please send any questions or inquiries about Oober via email to 1006shrillpatel@
 
 # License :scroll:
 Oober is licensed under the MIT license (look into the `LICENSE` file in root directory of this repository).
+
+# Contributions :pencil2:
+- **Shrill**
+  - App setup + app design + logo design
+  - Login (page design + logic)
+  - Registration (page design + logic)
+  - Email Verification using Firebase
+  - Firebase Setup + Integration
+  - Google Maps API Integration 
+  - Home Page (maps display, automatic search field population using Google Maps Autocomplete, dynamic change of routes and start/end markers)
+  - Request Carpool
+    - Available Carpools Page
+  - Offer Carpool
+    - Scan QR Page
+    - Offer Information Page (user can edit offer)
+  - User Trip History
+  - Sign Out Functionality
+  - Dynamic Rider Rating Page
+- **Bhavana**
+  - Update Account (Shrill helped by explaining how feature works and which methods to use)
+  - Rider Rating (Shrill helped to make form dynamic to the riders in a specific ride and the overall feature)
+- **Zhenia**
+  - Delete Account (Shrill helped implement this feature by exlpaining what exactly to do, which methods to use, improved error handling because initial implementation did not function as intended)
+- **Naishan**
+  - Did not contribute to development
+- **Jay**
+  - Did not contribute to development
