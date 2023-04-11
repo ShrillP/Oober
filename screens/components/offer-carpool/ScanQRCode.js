@@ -13,6 +13,7 @@ const viewMinY = ((height - finderHeight) / 2) * 0.9;
 
 const ScanQRCode = ({ route, navigation }) => {
     const forceUpdate = React.useCallback(() => updateState({}), []);
+    const { startLat, startLong, startLocationName, endLat, endLong, endLocationName, distance, duration, fare } = route.params;
     const [hasPermission, setHasPermission] = useState(null);
     const [scanned, setScanned] = useState(false);
 
@@ -39,7 +40,17 @@ const ScanQRCode = ({ route, navigation }) => {
             { 
                 text: 'OK', 
                 onPress: () => {
-                    navigation.navigate('Offer Carpool', route.params);
+                    navigation.navigate('Offer Carpool', {
+                        startLat: startLat,
+                        startLong: startLong,
+                        startLocationName: startLocationName,
+                        endLat: endLat,
+                        endLong: endLong,
+                        endLocationName: endLocationName,
+                        distance: distance,
+                        duration: duration,
+                        fare: fare,
+                    });
                 }
             },
         ],

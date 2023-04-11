@@ -8,24 +8,27 @@ import { ScrollView } from 'react-native-gesture-handler';
 const RideHistory = () => {
     const [rideHistory, setRideHistory] = useState([]);
     const [savedEmissions, setSavedEmissions] = useState(0);
+    const [rating, setRating] = useState(0);
 
     useEffect(() => {
-        const docRef = doc(db, 'Users', auth.currentUser.uid);
-        getDoc(docRef).then((doc) => {
-            if (doc.exists()) {
-                setRideHistory(doc.data().tripsTaken);
-                setSavedEmissions(doc.data().savedEmissions.toFixed(2));
-            } else {
-                console.log('No such document!');
-            }
-        }).catch((error) => {
-            console.log('Error getting document:', error);
-        });
+      const docRef = doc(db, 'Users', auth.currentUser.uid);
+      getDoc(docRef).then((doc) => {
+          if (doc.exists()) {
+              setRideHistory(doc.data().tripsTaken);
+              setSavedEmissions(doc.data().savedEmissions.toFixed(2));
+              setRating(doc.data().rating.toFixed(2));
+          } else {
+              console.log('No such document!');
+          }
+      }).catch((error) => {
+          console.log('Error getting document:', error);
+      });
     }, []);
 
   return (
     <View style={styles.mainBody}>
       <Text style={styles.title}>Your Oober Ride History</Text>
+      <Text style={styles.info}>Overall Rider Rating: {rating} Stars</Text>
       <Text style={styles.info}>Total Trips Taken: {rideHistory.length}</Text>
       <Text style={styles.info}>Carbon Emissions Saved: {savedEmissions} g CO2e/km</Text>
       <ScrollView>

@@ -42,7 +42,18 @@ const CarpoolRequest = ({ route, navigation }) => {
                     startName: startLocationName,
                     endName: endLocationName,
                   });
-                }
+                  Alert.alert(
+                    'Carpool Completed',
+                    'Your carpool has been completed successfully! We hope you enjoyed your carpool! Please rate the passengers you carpooled with.',
+                    [
+                      {
+                        text: 'OK',
+                        onPress: () => { return null; },
+                      },
+                    ],
+                    { cancelable: false }
+                  );
+                };
               } catch (error) {
                 console.log(error);
               }

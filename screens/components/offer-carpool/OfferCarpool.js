@@ -5,7 +5,7 @@ import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import Slider from '@react-native-community/slider';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { collection, getCountFromServer, doc, setDoc, GeoPoint } from 'firebase/firestore';
+import { collection, getCountFromServer, doc, setDoc, GeoPoint, arrayUnion } from 'firebase/firestore';
 import { auth, db } from '../../../firebaseConfig';
 
 const OfferCarpool = ({ route, navigation }) => {
@@ -41,15 +41,15 @@ const OfferCarpool = ({ route, navigation }) => {
             try {
               await setDoc(doc(db, 'AvailableCarpools', carpoolID), {
                 id: carpoolID,
-                activeCarpoolers: {
+                activeCarpoolers: arrayUnion({
                   name: auth.currentUser.displayName,
                   uid: auth.currentUser.uid,
-                },
+                }),
                 maxPassengers: Number(maxPassengerSliderValue) + 1,
                 isActive: true,
                 isFull: false,
-                fare: Number(fare),
-                distance: Number(distance),
+                fare: Number(fare.toFixed(2)),
+                distance: Number(distance.toFixed(2)),
                 totalEmissions: Number((186 * distance).toFixed(2)),
                 startingPoint: new GeoPoint(startLat, startLong),
                 endPoint: new GeoPoint(endLat, endLong),
