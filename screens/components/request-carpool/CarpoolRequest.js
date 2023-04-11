@@ -1,5 +1,5 @@
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { GOOGLE_MAPS_API_KEY } from '@env';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
@@ -8,7 +8,7 @@ import { auth, db } from '../../../firebaseConfig';
 import { ScrollView } from 'react-native-gesture-handler';
 
 const CarpoolRequest = ({ route, navigation }) => {
-  const forceUpdate = React.useCallback(() => updateState({}), []);
+  // const forceUpdate = React.useCallback(() => updateState({}), []);
   const mapRef = useRef(null);
   const { startLat, startLong, startLocationName, endLat, endLong, endLocationName } = route.params;
   const [carpools, setCarpools] = useState([]);
@@ -35,24 +35,25 @@ const CarpoolRequest = ({ route, navigation }) => {
                       uid: auth.currentUser.uid,
                     }),
                     isFull: carpoolSelected.activeCarpoolers.length + 1 === carpoolSelected.maxPassengers,
-                    isActive: carpoolSelected.activeCarpoolers.length + 1 === carpoolSelected.maxPassengers ? false : true,
+                    isActive: false,
                   });
-                  // TODO: move this to be done after the rider ratings screen
-                  // const userRef = doc(db, 'Users', auth.currentUser.uid);
-                  // updateDoc(userRef, {
-                  //   tripsTaken: arrayUnion({
-                  //     id: carpoolSelected.id,
-                  //     startName: startLocationName,
-                  //     endName: endLocationName,
-                  //     fare: carpoolSelected.fare / (carpoolSelected.activeCarpoolers.length + 1),
-                  //     emissionsSaved: carpoolSelected.totalEmissions - (carpoolSelected.totalEmissions / (carpoolSelected.activeCarpoolers.length + 1)),
-                  //   }),
-                  //   savedEmissions: increment(carpoolSelected.totalEmissions - (carpoolSelected.totalEmissions / (carpoolSelected.activeCarpoolers.length + 1))),
-                  // });
                   navigation.navigate('Rider Ratings', { 
-                    carpoolID: carpoolSelected.id,
+                    carpoolSelected: carpoolSelected,
+                    startName: startLocationName,
+                    endName: endLocationName,
                   });
-                }
+                  Alert.alert(
+                    'Carpool Completed',
+                    'Your carpool has been completed successfully! We hope you enjoyed your carpool! Please rate the passengers you carpooled with.',
+                    [
+                      {
+                        text: 'OK',
+                        onPress: () => { return null; },
+                      },
+                    ],
+                    { cancelable: false }
+                  );
+                };
               } catch (error) {
                 console.log(error);
               }
@@ -74,7 +75,9 @@ const CarpoolRequest = ({ route, navigation }) => {
     }
   };
 
-  getAllCarpools();
+  useEffect(() => {
+    getAllCarpools();
+  }, []);
 
   return (
     <View style={styles.mainBody}>

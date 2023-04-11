@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Rating } from 'react-native-ratings';
-import {doc, getDoc, updateDoc} from "firebase/firestore";
+import Slider from '@react-native-community/slider';
+import { doc, getDoc, updateDoc, arrayUnion, increment } from "firebase/firestore";
 import {
   StyleSheet,
   View,
@@ -8,16 +8,17 @@ import {
   KeyboardAvoidingView,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from "react-native";
-import {auth, db} from '../../../firebaseConfig';
+import { auth, db } from '../../../firebaseConfig';
 
   const RiderReview = ({ navigation, route }) => {
-    const { carpoolID } = route.params;
+    const { carpoolSelected, startName, endName } = route.params;
     const [ratings, setRatings]= useState([]);
     const [carpoolRiders, setCarpoolRiders]= useState([]);
 
     const getAllCarpoolRiders = async () => {
-      const docRef = doc(db, 'AvailableCarpools', carpoolID);
+      const docRef = doc(db, 'AvailableCarpools', carpoolSelected.id);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         setCarpoolRiders(docSnap.data().activeCarpoolers.filter((rider) => rider.uid !== auth.currentUser.uid));
@@ -25,34 +26,76 @@ import {auth, db} from '../../../firebaseConfig';
         console.log("No such document!");
       }
     };
-    getAllCarpoolRiders();
+
+    const updateTripsTaken = async (riderUID) => {
+      const docRef = doc(db, 'Users', riderUID);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        await updateDoc(docRef, {
+          tripsTaken: arrayUnion({
+            id: carpoolSelected.id,
+            startName: startName.split(',')[0],
+            endName: endName.split(',')[0],
+            fare: carpoolSelected.fare / (carpoolSelected.activeCarpoolers.length + 1),
+            emissionsSaved: carpoolSelected.totalEmissions - (carpoolSelected.totalEmissions / (carpoolSelected.activeCarpoolers.length + 1)),
+          }),
+          savedEmissions: increment(carpoolSelected.totalEmissions - (carpoolSelected.totalEmissions / (carpoolSelected.activeCarpoolers.length + 1))),
+        });
+      } else {
+        console.log("No such document!");
+      }
+    };
 
     useEffect(() => {
+      getAllCarpoolRiders();
       const initializeRatings = new Array(carpoolRiders.length).fill(0);
       setRatings([...initializeRatings]);
     }, []);
-    
-    const updateRiderRating = (rating, index) => {
+
+    function handleRatingClick(rating, index) {
       const newRatings = ratings.map((r, i) => {
         if (i === index) {
+          // Increment the clicked counter
           return rating;
+        } else {
+          // The rest haven't changed
+          return r;
         }
-        return r;
       });
       setRatings(newRatings);
+    }
+
+    const handleSubmitPress = () => {
+      Alert.alert(
+        'Submit Ratings',
+        'Are you sure you want to submit your ratings?',
+        [
+          {
+            text: 'Cancel',
+            onPress: () => { return null; },
+            style: 'cancel'
+          },
+          {
+            text: 'Yes',
+            onPress: () => {
+              carpoolRiders.forEach((rider, index) => {
+                const docRef = doc(db, 'Users', rider.uid);
+                getDoc(docRef).then((doc) => {
+                  const currentRating = doc.data().rating;
+                  updateDoc(docRef, {
+                    rating: (currentRating + ratings[index]) / 2
+                  });
+                });
+                updateTripsTaken(rider.uid);
+              });
+              updateTripsTaken(auth.currentUser.uid);
+              navigation.replace('HomeScreen');
+            }
+          }
+        ],
+        { cancelable: false }
+      );
     };
-    
-    // const handleSubmitPress = () => {
-    //   console.log("rated John:" + range)
-    //   const docRef = doc(db, 'Users', '12345')
-    //   getDoc(docRef).then((doc) => {
-    //     const currentRating = doc.data().Rating;
-    //     console.log('Current rating:', currentRating);
-    //     updateDoc(docRef, {
-    //       Rating: (currentRating + range)/2
-    //     });
-    //   })
-    // }
 
     return (
       <View style={styles.mainBody}>
@@ -63,15 +106,20 @@ import {auth, db} from '../../../firebaseConfig';
                 <Text style={styles.contentStyle}>
                   Please provide a customer review for <Text style={{ fontWeight: 'bold' }}>{rider.name}</Text> based on your experience with them.
                 </Text>
-                <Rating
-                  type='star'
-                  tintColor="#A7A8A8"
-                  ratingCount={5}
-                  startingValue={0}
-                  imageSize={60}
-                  showRating
-                  onFinishRating={(value) => updateRiderRating(value, index)}
+                <Slider
+                  style={{width: 300, height: 40, alignSelf: 'center'}}
+                  minimumValue={0}
+                  maximumValue={5}
+                  step={1}
+                  minimumTrackTintColor="#2b2b2b"
+                  maximumTrackTintColor="#000000"
+                  thumbTintColor="#5FBAA7"
+                  value={0}
+                  onValueChange={(value) => handleRatingClick(value, index)}
                 />
+                <Text style={styles.contentStyle}>
+                  <Text style={{fontWeight: 'bold'}}>{ratings[index]} / 5 Stars</Text>
+                </Text>
               </View>
             );
           })}

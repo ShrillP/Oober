@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useState, createRef, } from "react";
+import React, { useState, createRef, useEffect, } from "react";
 import { doc, updateDoc, deleteDoc, getDoc } from "firebase/firestore";
 import {
   SafeAreaView,
@@ -34,11 +34,13 @@ import {updateProfile, updatePassword, signOut, deleteUser } from 'firebase/auth
     const [oldFirstName, setOldFirstName] = useState('');
     const [oldLastName, setOldLastName] = useState('');
     const [oldAddress, setOldAddress] = useState('');
-    getDoc(docRef).then((docSnap) => {
-      setOldFirstName(docSnap.data().firstName);
-      setOldLastName(docSnap.data().lastName);
-      setOldAddress(docSnap.data().address);
-    });
+    useEffect(() => {
+      getDoc(docRef).then((docSnap) => {
+        setOldFirstName(docSnap.data().firstName);
+        setOldLastName(docSnap.data().lastName);
+        setOldAddress(docSnap.data().address);
+      });
+    }, []);
 
     const handleSubmitPress = () => {
         setError("");
